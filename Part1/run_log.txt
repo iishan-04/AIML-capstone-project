@@ -1,0 +1,283 @@
+================================================================================
+TASK 1 — Load and inspect
+================================================================================
+
+First 5 rows:
+    employee_id   age years_experience education_level   department region  performance_score  monthly_hours  \
+0         1199  41.0             16.7       Bachelors        Sales  North               2.45          123.0   
+1          527  56.0             35.0             PhD      Support   East                NaN          181.2   
+2          394  39.0             13.9         Masters        Sales  North               3.47           86.9   
+3         1408  51.0             26.8     High School  Engineering  South               3.75           98.5   
+4          434  36.0             16.4         Masters  Engineering   West               3.61          209.7   
+
+   distance_from_office_km  num_projects  bonus_pct     salary  
+0                    19.22             1      16.05   68904.53  
+1                    21.45             4      16.62  122813.41  
+2                     6.81             5      15.33   78883.95  
+3                     3.49             2        NaN   98529.81  
+4                     8.41             3      26.86  104254.78  
+
+Column dtypes:
+ employee_id                  int64
+age                        float64
+years_experience               str
+education_level                str
+department                     str
+region                         str
+performance_score          float64
+monthly_hours              float64
+distance_from_office_km    float64
+num_projects                 int64
+bonus_pct                  float64
+salary                     float64
+dtype: object
+
+Shape: (2015, 12)
+
+================================================================================
+TASK 2 — Null value analysis
+================================================================================
+
+Null count/percentage per column:
+                          null_count  null_pct
+employee_id                       0      0.00
+age                               0      0.00
+years_experience                  0      0.00
+education_level                   0      0.00
+department                        0      0.00
+region                            0      0.00
+performance_score               140      6.95
+monthly_hours                   101      5.01
+distance_from_office_km         123      6.10
+num_projects                      0      0.00
+bonus_pct                       705     34.99
+salary                            0      0.00
+
+Columns exceeding 20% null rate:
+            null_count  null_pct
+bonus_pct         705     34.99
+
+Dropping columns exceeding 20% nulls: ['bonus_pct']
+
+Numeric columns to median-fill: ['performance_score', 'monthly_hours', 'distance_from_office_km']
+
+Nulls remaining after fill:
+ employee_id                0
+age                        0
+years_experience           0
+education_level            0
+department                 0
+region                     0
+performance_score          0
+monthly_hours              0
+distance_from_office_km    0
+num_projects               0
+salary                     0
+dtype: int64
+
+================================================================================
+TASK 3 — Duplicate detection and removal
+================================================================================
+
+Duplicate rows found: 15
+Rows removed: 15. New shape: (2000, 11)
+
+Null % before vs after duplicate removal:
+                          before  after
+employee_id                 0.0    0.0
+age                         0.0    0.0
+years_experience            0.0    0.0
+education_level             0.0    0.0
+department                  0.0    0.0
+region                      0.0    0.0
+performance_score           0.0    0.0
+monthly_hours               0.0    0.0
+distance_from_office_km     0.0    0.0
+num_projects                0.0    0.0
+salary                      0.0    0.0
+
+================================================================================
+TASK 4 — Data type correction
+================================================================================
+
+Memory usage before conversion: 569148 bytes (555.8 KB)
+
+years_experience dtype before conversion: str
+New NaNs introduced by coercion (e.g. 'N/A' placeholders): 30
+years_experience dtype after conversion:  float64
+Memory usage after conversion:  150831 bytes (147.3 KB)
+Memory reduction: 418317 bytes (73.5% smaller)
+
+Dtypes after correction:
+ employee_id                   int64
+age                         float64
+years_experience            float64
+education_level            category
+department                 category
+region                     category
+performance_score           float64
+monthly_hours               float64
+distance_from_office_km     float64
+num_projects                  int64
+salary                      float64
+dtype: object
+
+================================================================================
+TASK 5 — Descriptive statistics and skewness
+================================================================================
+
+Describe:
+                age  years_experience  performance_score  monthly_hours  distance_from_office_km  num_projects  \
+count  2000.000000       2000.000000        2000.000000     2000.00000              2000.000000   2000.000000   
+mean     41.113500         18.258800           3.185080      148.16780                 7.725680      4.019500   
+std      11.149788         11.225513           0.674799       59.27162                 7.428355      2.052127   
+min      22.000000          0.000000           1.020000       28.80000                 0.000000      0.000000   
+25%      32.000000          8.700000           2.760000      106.50000                 2.547500      3.000000   
+50%      41.500000         18.400000           3.170000      139.55000                 5.610000      4.000000   
+75%      51.000000         27.325000           3.610000      178.02500                10.152500      5.000000   
+max      60.000000         40.000000           5.000000      417.90000                57.570000     13.000000   
+
+              salary  
+count    2000.000000  
+mean    86221.230160  
+std     23157.538481  
+min     30178.910000  
+25%     68448.730000  
+50%     85568.545000  
+75%    103983.342500  
+max    151987.250000  
+
+Skewness (sorted by absolute value):
+ distance_from_office_km    1.912976
+monthly_hours              0.921921
+num_projects               0.456629
+salary                     0.062139
+years_experience           0.046939
+performance_score          0.027998
+age                       -0.017773
+dtype: float64
+
+Most skewed column: distance_from_office_km (skew = 1.913)
+
+================================================================================
+TASK 6 — Outlier detection with IQR
+================================================================================
+
+distance_from_office_km: Q1=2.55, Q3=10.15, IQR=7.61, bounds=(-8.86, 21.56), outliers=125 (6.2% of rows)
+
+monthly_hours: Q1=106.50, Q3=178.03, IQR=71.53, bounds=(-0.79, 285.31), outliers=57 (2.9% of rows)
+
+================================================================================
+TASK 7 — Visualizations
+================================================================================
+
+Pearson correlation (years_experience, salary) = 0.878
+
+Median salary by education level:
+ education_level
+High School     77983.230
+Bachelors       84320.515
+Masters         90482.900
+PhD            103438.520
+Name: salary, dtype: float64
+
+Highest |correlation| pair: ('age', 'years_experience') = 0.959
+
+Full correlation matrix:
+                            age  years_experience  performance_score  monthly_hours  distance_from_office_km  \
+age                      1.000             0.959              0.018         -0.027                    0.019   
+years_experience         0.959             1.000              0.018         -0.031                    0.019   
+performance_score        0.018             0.018              1.000          0.010                   -0.002   
+monthly_hours           -0.027            -0.031              0.010          1.000                    0.017   
+distance_from_office_km  0.019             0.019             -0.002          0.017                    1.000   
+num_projects            -0.012            -0.020              0.018          0.005                   -0.018   
+salary                   0.857             0.878              0.108         -0.032                    0.014   
+
+                         num_projects  salary  
+age                            -0.012   0.857  
+years_experience               -0.020   0.878  
+performance_score               0.018   0.108  
+monthly_hours                   0.005  -0.032  
+distance_from_office_km        -0.018   0.014  
+num_projects                    1.000  -0.013  
+salary                         -0.013   1.000  
+
+================================================================================
+TASK 8 — Imputation strategy comparison
+================================================================================
+
+distance_from_office_km: mean = 7.726, median = 5.610, skew = 1.913
+Remaining nulls in distance_from_office_km: 0
+
+monthly_hours: mean = 148.168, median = 139.550, skew = 0.922
+Remaining nulls in monthly_hours: 0
+
+================================================================================
+TASK 8b — Spearman rank correlation vs Pearson
+================================================================================
+
+Pearson matrix:
+                            age  years_experience  performance_score  monthly_hours  distance_from_office_km  \
+age                      1.000             0.959              0.018         -0.027                    0.019   
+years_experience         0.959             1.000              0.018         -0.031                    0.019   
+performance_score        0.018             0.018              1.000          0.010                   -0.002   
+monthly_hours           -0.027            -0.031              0.010          1.000                    0.017   
+distance_from_office_km  0.019             0.019             -0.002          0.017                    1.000   
+num_projects            -0.012            -0.020              0.018          0.005                   -0.018   
+salary                   0.857             0.878              0.108         -0.032                    0.014   
+
+                         num_projects  salary  
+age                            -0.012   0.857  
+years_experience               -0.020   0.878  
+performance_score               0.018   0.108  
+monthly_hours                   0.005  -0.032  
+distance_from_office_km        -0.018   0.014  
+num_projects                    1.000  -0.013  
+salary                         -0.013   1.000  
+
+Spearman matrix:
+                            age  years_experience  performance_score  monthly_hours  distance_from_office_km  \
+age                      1.000             0.960              0.019         -0.021                    0.017   
+years_experience         0.960             1.000              0.017         -0.026                    0.019   
+performance_score        0.019             0.017              1.000          0.009                   -0.029   
+monthly_hours           -0.021            -0.026              0.009          1.000                    0.045   
+distance_from_office_km  0.017             0.019             -0.029          0.045                    1.000   
+num_projects            -0.012            -0.022              0.014          0.017                   -0.005   
+salary                   0.865             0.886              0.097         -0.022                    0.018   
+
+                         num_projects  salary  
+age                            -0.012   0.865  
+years_experience               -0.022   0.886  
+performance_score               0.014   0.097  
+monthly_hours                   0.017  -0.022  
+distance_from_office_km        -0.005   0.018  
+num_projects                    1.000  -0.011  
+salary                         -0.011   1.000  
+
+Top 3 pairs by |Spearman - Pearson|:
+                      col_a                    col_b   pearson  spearman  abs_diff
+0  distance_from_office_km            monthly_hours  0.017466  0.044980  0.027515
+1        performance_score  distance_from_office_km -0.001712 -0.028508  0.026797
+2  distance_from_office_km             num_projects -0.018146 -0.005047  0.013098
+
+================================================================================
+TASK 8c — Grouped aggregation
+================================================================================
+
+Salary by department (mean, std, count):
+                      mean           std  count
+department                                    
+Engineering  94316.830783  21714.606171    562
+Finance      90043.271919  23875.524478    271
+HR           79316.948477  22155.881466    197
+Marketing    82535.600780  21311.137963    282
+Sales        81897.153554  22646.306126    453
+Support      80999.088936  23482.612728    235
+
+Highest mean group: Engineering
+Highest std group: Finance
+Ratio of highest to lowest group mean: 1.189
+
+================================================================================
+cleaned_data.csv saved. Final shape: (2000, 11)
+================================================================================
