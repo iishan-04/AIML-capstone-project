@@ -1,0 +1,161 @@
+================================================================================
+TASK 1 — Load data and define labels
+================================================================================
+
+Loaded cleaned_data.csv: (2000, 11)
+
+y_reg = df['salary'] (continuous)
+y_clf = (df['salary'] >= 103983.34).astype(int)  [top-25% 'high_earner' flag]
+
+y_clf class balance:
+salary
+0    1500
+1     500
+Name: count, dtype: int64
+
+y_clf class balance (%):
+salary
+0    75.0
+1    25.0
+Name: proportion, dtype: float64
+
+Feature matrix X shape (before encoding): (2000, 9)
+X columns: ['age', 'years_experience', 'education_level', 'department', 'region', 'performance_score', 'monthly_hours', 'distance_from_office_km', 'num_projects']
+
+================================================================================
+TASK 2 — Encode categorical columns
+================================================================================
+
+education_level ordinal mapping: {'High School': 0, 'Bachelors': 1, 'Masters': 2, 'PhD': 3}
+Justification: education level has a genuine real-world ordering (each level represents strictly more education than the last), so mapping to increasing integers preserves meaningful information a linear model can use (e.g. a monotonic relationship with salary).
+
+department categories: ['Engineering', 'Finance', 'HR', 'Marketing', 'Sales', 'Support']
+region categories: ['Central', 'East', 'North', 'South', 'West']
+Justification: department and region have no inherent ranking (e.g. 'Engineering' is not numerically greater than 'Sales'). Label-encoding them would impose a false ordinal relationship the model would wrongly treat as meaningful (e.g. implying HR < Engineering < Finance). One-hot encoding avoids this by giving each category its own independent binary column.
+
+X shape after encoding: (2000, 16)
+X columns after encoding: ['age', 'years_experience', 'education_level', 'performance_score', 'monthly_hours', 'distance_from_office_km', 'num_projects', 'department_Finance', 'department_HR', 'department_Marketing', 'department_Sales', 'department_Support', 'region_East', 'region_North', 'region_South', 'region_West']
+
+================================================================================
+TASK 3 — Leak-free train-test split and scaling
+================================================================================
+
+Train shape: (1600, 16), Test shape: (400, 16)
+
+IMPORTANT: the scaler was fit only on X_train, then used to transform both X_train and X_test. Fitting it on the full dataset (train+test combined) would be data leakage: the scaler's mean/std would then partly reflect the test set's own statistics, meaning information about the test set would leak into how the training features are represented, giving an optimistic bias to every metric computed later. The test set must stay statistically 'unseen' until evaluation.
+
+================================================================================
+TASK 4 — Linear Regression
+================================================================================
+
+Linear Regression — MSE: 24982139.95, R2: 0.9540
+
+Coefficients (sorted by absolute value):
+                     feature   coefficient
+1          years_experience  15241.595012
+2           education_level   7786.823124
+0                       age   5362.006642
+11       department_Support  -5349.726719
+10         department_Sales  -5067.570598
+8             department_HR  -4327.772923
+9      department_Marketing  -3185.296829
+3         performance_score   1963.122323
+7        department_Finance  -1029.721232
+5   distance_from_office_km   -158.771652
+14             region_South   -144.002421
+4             monthly_hours   -143.186296
+15              region_West     85.122496
+13             region_North     53.182859
+6              num_projects    -44.332871
+12              region_East    -39.356426
+
+Top 3 features by |coefficient|:
+            feature   coefficient
+1  years_experience  15241.595012
+2   education_level   7786.823124
+0               age   5362.006642
+
+Ridge Regression (alpha=1.0)
+Ridge Regression — MSE: 24979257.44, R2: 0.9540
+
+Comparison table:
+                      model           MSE        R2
+0  Linear Regression (OLS)  2.498214e+07  0.954034
+1        Ridge (alpha=1.0)  2.497926e+07  0.954040
+
+================================================================================
+TASK 5 — Logistic Regression (with class-imbalance handling)
+================================================================================
+
+y_clf_train class counts:
+salary
+0    1194
+1     406
+Name: count, dtype: int64
+Minority class: 25.4% of training samples
+
+Minority class is below 35% -> imbalance handling required.
+imbalanced-learn not installed here -> falling back to manual random oversampling (SMOTE is the primary/preferred method — install with `pip install imbalanced-learn` to use it).
+
+Resampling method used: Manual random oversampling (SMOTE fallback)
+Class counts BEFORE resampling:
+salary
+0    1194
+1     406
+Name: count, dtype: int64
+Class counts AFTER resampling:
+_y
+0    1194
+1    1194
+Name: count, dtype: int64
+
+Confusion matrix:
+[[284  22]
+ [  3  91]]
+
+Classification report:
+              precision    recall  f1-score   support
+
+           0       0.99      0.93      0.96       306
+           1       0.81      0.97      0.88        94
+
+    accuracy                           0.94       400
+   macro avg       0.90      0.95      0.92       400
+weighted avg       0.95      0.94      0.94       400
+
+
+ROC AUC: 0.9937
+
+================================================================================
+TASK 5b — Decision-threshold sensitivity
+================================================================================
+
+    Threshold  Precision    Recall        F1
+0        0.3   0.762295  0.989362  0.861111
+1        0.4   0.786325  0.978723  0.872038
+2        0.5   0.805310  0.968085  0.879227
+3        0.6   0.858491  0.968085  0.910000
+4        0.7   0.909091  0.957447  0.932642
+
+F1-maximising threshold: 0.7 (F1 = 0.9326)
+
+================================================================================
+TASK 6 — Regularization experiment
+================================================================================
+
+                             model  precision    recall       AUC
+0                C=1.0 (baseline)   0.805310  0.968085  0.993673
+1  C=0.01 (strong regularization)   0.715385  0.989362  0.988423
+
+================================================================================
+TASK 6b — Bootstrap CI for AUC difference (C=1.0 minus C=0.01)
+================================================================================
+
+Bootstrap iterations used: 500 (of 500 requested)
+Mean AUC difference (C=1.0 - C=0.01): 0.0053
+95% CI: [0.0006, 0.0123]
+CI excludes zero: True
+
+================================================================================
+Part 2 complete.
+================================================================================
