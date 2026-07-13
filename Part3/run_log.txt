@@ -1,0 +1,109 @@
+================================================================================
+SETUP — Rebuilding Part 2's preprocessing (same random_state=42)
+================================================================================
+X_train_scaled: (1600, 16), X_test_scaled: (400, 16)
+y_clf_train balance:
+salary
+0    1194
+1     406
+Name: count, dtype: int64
+
+================================================================================
+TASK 1 — Decision Tree baseline (unconstrained)
+================================================================================
+Unconstrained tree — Train accuracy: 1.0000, Test accuracy: 0.9075
+Train/test gap: 0.0925
+
+================================================================================
+TASK 2 — Controlled Decision Tree (max_depth=5, min_samples_split=20)
+================================================================================
+Controlled tree — Train accuracy: 0.9363, Test accuracy: 0.9025
+Train/test gap: 0.0338
+
+================================================================================
+TASK 3 — Gini vs Entropy (max_depth=5)
+================================================================================
+Gini test accuracy:    0.9025
+Entropy test accuracy: 0.9075
+
+================================================================================
+TASK 4 — Random Forest (n_estimators=100, max_depth=10)
+================================================================================
+Random Forest — Train accuracy: 0.9981, Test accuracy: 0.9225, ROC-AUC: 0.9764
+
+Top 5 features by importance:
+years_experience     0.413516
+age                  0.247708
+education_level      0.084155
+performance_score    0.058433
+monthly_hours        0.049001
+dtype: float64
+
+================================================================================
+TASK 4a — Gradient Boosting (n_estimators=100, lr=0.1, max_depth=3)
+================================================================================
+Gradient Boosting — Train accuracy: 0.9744, Test accuracy: 0.9500, ROC-AUC: 0.9881
+
+================================================================================
+TASK 4b — Feature ablation study
+================================================================================
+5 lowest-importance features: ['region_North', 'region_West', 'department_Marketing', 'region_South', 'region_East']
+Full model  (16 features)  test AUC: 0.9764
+Reduced model (11 features) test AUC: 0.9755
+AUC change: -0.0009
+
+================================================================================
+TASK 5 — Cross-validated comparison (5-fold StratifiedKFold, ROC-AUC)
+================================================================================
+Logistic Regression: mean AUC = 0.9887, std = 0.0027
+Decision Tree (controlled): mean AUC = 0.9427, std = 0.0109
+Random Forest: mean AUC = 0.9709, std = 0.0024
+Gradient Boosting: mean AUC = 0.9803, std = 0.0044
+
+================================================================================
+TASK 6 — GridSearchCV (Random Forest)
+================================================================================
+
+Best params: {'randomforestclassifier__max_depth': None, 'randomforestclassifier__min_samples_leaf': 1, 'randomforestclassifier__n_estimators': 200}
+Best CV score (ROC-AUC): 0.9731
+
+Total grid configurations: 18 (x 5 folds = 90 total fits)
+
+================================================================================
+TASK 7 — Manual learning curve (best pipeline from Task 6)
+================================================================================
+Fraction 0.2 (320 rows) — Train AUC: 1.0000, Test AUC: 0.9549
+Fraction 0.4 (640 rows) — Train AUC: 1.0000, Test AUC: 0.9666
+Fraction 0.6 (960 rows) — Train AUC: 1.0000, Test AUC: 0.9715
+Fraction 0.8 (1280 rows) — Train AUC: 1.0000, Test AUC: 0.9738
+Fraction 1.0 (1600 rows) — Train AUC: 1.0000, Test AUC: 0.9744
+
+    Fraction  N rows  Train AUC  Test AUC
+0       0.2     320        1.0  0.954892
+1       0.4     640        1.0  0.966573
+2       0.6     960        1.0  0.971492
+3       0.8    1280        1.0  0.973839
+4       1.0    1600        1.0  0.974447
+
+================================================================================
+TASK 8 — Serialize best model
+================================================================================
+Saved best_pipeline to best_model.pkl
+
+Reload-and-predict demo on 2 hand-picked test rows:
+Predictions: [0 0]
+Probabilities: [0.005 0.   ]
+
+================================================================================
+TASK 9 — Summary comparison table
+================================================================================
+
+                         Model  CV Mean AUC  CV Std AUC  Test AUC
+0         Logistic Regression     0.988679    0.002653  0.994090
+3           Gradient Boosting     0.980284    0.004446  0.988128
+2               Random Forest     0.970902    0.002448  0.976359
+1  Decision Tree (controlled)     0.942712    0.010869  0.955917
+
+================================================================================
+Part 3 complete.
+================================================================================
